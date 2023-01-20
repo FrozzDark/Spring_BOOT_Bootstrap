@@ -17,6 +17,7 @@ import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -71,6 +72,10 @@ public class UserService implements UserDetailsService {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     public void update(User updatedUser, long id) {
+        User userToBeUpdated = findOne(id);
+        if(userToBeUpdated != null && !Objects.equals(userToBeUpdated.getPassword(), updatedUser.getPassword())) {
+            updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
         updatedUser.setId(id);
         userRepository.save(updatedUser);
     }
